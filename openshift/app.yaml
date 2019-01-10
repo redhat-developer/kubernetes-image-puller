@@ -1,0 +1,59 @@
+kind: Template
+apiVersion: v1
+metadata:
+  labels:
+    app: che-image-caching
+  name: che-image-caching
+objects:
+- kind: ServiceAccount
+  apiVersion: v1
+  metadata:
+    labels:
+      app: che-image-caching
+    name: ${SERVICEACCOUNT_NAME}
+- kind: DeploymentConfig
+  apiVersion: v1
+  metadata:
+    labels:
+      app: che-image-caching
+    name: che-image-caching
+  spec:
+    replicas: 1
+    revisionHistoryLimit: 2
+    selector:
+      app: che-image-caching
+    strategy:
+      type: "Recreate"
+    template:
+      metadata:
+        labels:
+          app: che-image-caching
+      spec: 
+        containers: 
+        - name: che-image-caching
+          image: ${IMAGE}:${IMAGE_TAG}
+          imagePullPolicy: Never
+          envFrom:
+          - configMapRef:
+              name: che-image-caching
+          env: 
+          - name: SERVICE_ACCOUNT_ID
+            valueFrom:
+              secretKeyRef:
+                name: ${SERVICE_ACCT_CREDENTIALS_SECRET}
+                key: service.account.id
+          - name: SERVICE_ACCOUNT_SECRET
+            valueFrom:
+              secretKeyRef:
+                name: ${SERVICE_ACCT_CREDENTIALS_SECRET}
+                key: service.account.secret
+        serviceAccountName: ${SERVICEACCOUNT_NAME}
+parameters:
+- name: SERVICEACCOUNT_NAME
+  value: che-imagecaching-sa
+- name: SERVICE_ACCT_CREDENTIALS_SECRET
+  value: che-imagecaching-secret
+- name: IMAGE
+  value: image-caching-test
+- name: IMAGE_TAG
+  value: dev
