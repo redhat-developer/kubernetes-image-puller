@@ -2,40 +2,59 @@ kind: Template
 apiVersion: v1
 metadata:
   labels:
-    app: che-image-caching
-  name: che-image-caching
+    app: kubernetes-image-puller
+  name: kubernetes-image-puller
 objects:
 - kind: ServiceAccount
   apiVersion: v1
   metadata:
     labels:
-      app: che-image-caching
+      app: kubernetes-image-puller
     name: ${SERVICEACCOUNT_NAME}
 - kind: DeploymentConfig
   apiVersion: v1
   metadata:
     labels:
-      app: che-image-caching
-    name: che-image-caching
+      app: kubernetes-image-puller
+    name: kubernetes-image-puller
   spec:
     replicas: 1
     revisionHistoryLimit: 2
     selector:
-      app: che-image-caching
+      app: kubernetes-image-puller
     strategy:
       type: "Recreate"
     template:
       metadata:
         labels:
-          app: che-image-caching
+          app: kubernetes-image-puller
       spec: 
         containers: 
-        - name: che-image-caching
+        - name: kubernetes-image-puller
           image: ${IMAGE}:${IMAGE_TAG}
           imagePullPolicy: Never
+          livenessProbe:
+            exec:
+              command:
+                - pidof
+                - kubernetes-image-puller
+            initialDelaySeconds: 5
+            timeoutSeconds: 1
+          readinessProbe:
+            exec:
+              command:
+                - pidof
+                - kubernetes-image-puller
+            initialDelaySeconds: 5
+            timeoutSeconds: 1
+          resources:
+            requests:
+              memory: 5Mi
+            limits:
+              memory: 50Mi
           envFrom:
           - configMapRef:
-              name: che-image-caching
+              name: kubernetes-image-puller
           env: 
           - name: SERVICE_ACCOUNT_ID
             valueFrom:
@@ -50,9 +69,9 @@ objects:
         serviceAccountName: ${SERVICEACCOUNT_NAME}
 parameters:
 - name: SERVICEACCOUNT_NAME
-  value: che-imagecaching-sa
+  value: kubernetes-image-puller
 - name: SERVICE_ACCT_CREDENTIALS_SECRET
-  value: che-imagecaching-secret
+  value: kubernetes-image-puller
 - name: IMAGE
   value: image-caching-test
 - name: IMAGE_TAG

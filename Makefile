@@ -4,6 +4,8 @@ DOCKERIMAGE_TAG=latest
 
 all: build docker
 
+.PHONY: build docker
+
 build:
 	GOOS=linux go build -v -o ./bin/${BINARY_NAME} ./cmd/main.go
 

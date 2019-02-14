@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: che-image-caching
+  name: kubernetes-image-puller
 type: Opaque
 data:
   IMAGES: >
