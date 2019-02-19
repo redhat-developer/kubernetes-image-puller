@@ -9,7 +9,6 @@
 
 set -u
 set -e
-set -x
 
 LOCAL_IMAGE_NAME='kubernetes-image-puller'
 REGISTRY='quay.io'
@@ -17,6 +16,31 @@ ORGANIZATION='openshiftio'
 RHEL_IMAGE_NAME='rhel-kubernetes-image-puller'
 CENTOS_IMAGE_NAME='kubernetes-image-puller'
 
+# Source build variables
+function set_env_vars() {
+  if [ -e "jenkins-env" ]; then
+    cat jenkins-env \
+      | grep -E "(DEVSHIFT_TAG_LEN|QUAY_USERNAME|QUAY_PASSWORD|GIT_COMMIT)=" \
+      | sed 's/^/export /g' \
+      > ~/.jenkins-env
+    source ~/.jenkins-env
+  fi
+}
+
+function install_deps() {
+  # Update machine, get required deps in place
+  yum -y update
+  yum -y install epel-release
+  yum -y install --enablerepo=epel docker make golang git
+  systemctl start docker
+
+  # Login to quay.io
+  docker login -u ${QUAY_USERNAME} -p ${QUAY_PASSWORD} ${REGISTRY}
+
+  setup_golang
+}
+
+# Perform necessary GOPATH setup to make project buildable
 function setup_golang() {
   go version
   mkdir -p $HOME/go $HOME/go/src $HOME/go/bin $HOME/go/pkg
@@ -44,30 +68,13 @@ function cleanup() {
 }
 trap cleanup EXIT
 
-
-# Source build variables
-if [ -e "jenkins-env" ]; then
-  cat jenkins-env \
-    | grep -E "(DEVSHIFT_TAG_LEN|QUAY_USERNAME|QUAY_PASSWORD|GIT_COMMIT)=" \
-    | sed 's/^/export /g' \
-    > ~/.jenkins-env
-  source ~/.jenkins-env
-fi
-
-# Update machine, get required deps in place
-yum -y update
-yum -y install epel-release
-yum -y install --enablerepo=epel docker make golang git
-systemctl start docker
-
-# Login to quay.io
-docker login -u ${QUAY_USERNAME} -p ${QUAY_PASSWORD} ${REGISTRY}
+set_env_vars
+install_deps
 
 # Build main executable and docker image, push to quay.io
-setup_golang
 make build
 TAG=$(echo $GIT_COMMIT | cut -c1-${DEVSHIFT_TAG_LEN})
-if [ "$TARGET" = "rhel" ]; then
+if [[ ${TARGET:-"centos"} = 'rhel' ]]; then
   docker build -t ${LOCAL_IMAGE_NAME} -f ./docker/Dockerfile.rhel .
   tag_and_push ${REGISTRY}/${ORGANIZATION}/${RHEL_IMAGE_NAME}:${TAG}
   tag_and_push ${REGISTRY}/${ORGANIZATION}/${RHEL_IMAGE_NAME}:latest
