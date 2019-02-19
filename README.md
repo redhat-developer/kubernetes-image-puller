@@ -1,3 +1,5 @@
+[![Build Status](https://ci.centos.org/job/devtools-kubernetes-image-puller-build-master/badge/icon)](https://ci.centos.org/job/devtools-kubernetes-image-puller-build-master/)
+
 ## Requirements
 The application is meant to be used in conjunction with [fabric-oso-proxy](https://github.com/fabric8-services/fabric8-oso-proxy) and [fabric8-auth](https://github.com/fabric8-services/fabric8-auth).
 
