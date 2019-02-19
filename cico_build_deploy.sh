@@ -29,9 +29,9 @@ function set_env_vars() {
 
 function install_deps() {
   # Update machine, get required deps in place
-  yum -y update
-  yum -y install epel-release
-  yum -y install --enablerepo=epel docker make golang git
+  yum -y -d 1 update
+  yum -y -d 1 install epel-release
+  yum -y -d 1 install --enablerepo=epel docker make golang git
   systemctl start docker
 
   # Login to quay.io
@@ -56,7 +56,7 @@ function tag_and_push() {
   local tag
   tag=$1
   docker tag ${LOCAL_IMAGE_NAME} $tag
-  docker push $tag
+  docker push $tag | cat
 }
 
 # Cleanup on exit
@@ -75,11 +75,11 @@ install_deps
 make build
 TAG=$(echo $GIT_COMMIT | cut -c1-${DEVSHIFT_TAG_LEN})
 if [[ ${TARGET:-"centos"} = 'rhel' ]]; then
-  docker build -t ${LOCAL_IMAGE_NAME} -f ./docker/Dockerfile.rhel .
-  tag_and_push ${REGISTRY}/${ORGANIZATION}/${RHEL_IMAGE_NAME}:${TAG}
+  docker build -t ${LOCAL_IMAGE_NAME} -f ./docker/Dockerfile.rhel . | cat
+  tag_and_push ${REGISTRY}/${ORGANIZATION}/${RHEL_IMAGE_NAME}:${TAG} 
   tag_and_push ${REGISTRY}/${ORGANIZATION}/${RHEL_IMAGE_NAME}:latest
 else
-  docker build -t ${LOCAL_IMAGE_NAME} -f ./docker/Dockerfile.centos .
+  docker build -t ${LOCAL_IMAGE_NAME} -f ./docker/Dockerfile.centos . | cat
   tag_and_push ${REGISTRY}/${ORGANIZATION}/${CENTOS_IMAGE_NAME}:${TAG}
   tag_and_push ${REGISTRY}/${ORGANIZATION}/${CENTOS_IMAGE_NAME}:latest
 fi
