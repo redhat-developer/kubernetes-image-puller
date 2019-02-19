@@ -45,7 +45,8 @@ fi
 
 # Update machine, get required deps in place
 yum -y update
-yum -y install docker golang
+yum -y install epel-release
+yum -y install --enablerepo=epel docker make golang git
 systemctl start docker
 
 # Login to quay.io
