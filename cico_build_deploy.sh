@@ -17,6 +17,16 @@ ORGANIZATION='openshiftio'
 RHEL_IMAGE_NAME='rhel-kubernetes-image-puller'
 CENTOS_IMAGE_NAME='kubernetes-image-puller'
 
+function setup_golang() {
+  go version
+  mkdir -p $HOME/go $HOME/go/src $HOME/go/bin $HOME/go/pkg
+  export GOPATH=$HOME/go
+  export PATH=${GOPATH}/bin:$PATH
+  mkdir -p ${GOPATH}/src/github.com/redhat-developer
+  cp -r $HOME/payload ${GOPATH}/src/github.com/redhat-developer/kubernetes-image-puller
+  cd ${GOPATH}/src/github.com/redhat-developer/kubernetes-image-puller
+}
+
 # Simplify tagging and pushing
 function tag_and_push() {
   local tag
@@ -33,6 +43,7 @@ function cleanup() {
   fi
 }
 trap cleanup EXIT
+
 
 # Source build variables
 if [ -e "jenkins-env" ]; then
@@ -53,6 +64,7 @@ systemctl start docker
 docker login -u ${QUAY_USERNAME} -p ${QUAY_PASSWORD} ${REGISTRY}
 
 # Build main executable and docker image, push to quay.io
+setup_golang
 make build
 TAG=$(echo $GIT_COMMIT | cut -c1-${DEVSHIFT_TAG_LEN})
 if [ "$TARGET" = "rhel" ]; then
