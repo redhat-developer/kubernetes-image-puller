@@ -11,9 +11,9 @@ data:
     init-broker=eclipse/che-init-plugin-broker:v0.7.1;
     plugin-broker=eclipse/che-plugin-broker:v0.7.0;
     jwt-proxy=eclipse/che-jwtproxy:latest;
-  DAEMONSET_NAME: "che-image-cache"
+  DAEMONSET_NAME: "kubernetes-image-puller"
   CACHING_INTERVAL_HOURS: "1"
   OPENSHIFT_PROXY_URL: "https://osoproxy.prod-preview.openshift.io"
   OIDC_PROVIDER: "https://auth.prod-preview.openshift.io/api"
-  NAMESPACE: "daemonset-test"
-  IMPERSONATE_USERS: "user1,user2"
+  NAMESPACE: "k8s-image-puller"
+  IMPERSONATE_USERS: "osio-ci-ee3-preview"
