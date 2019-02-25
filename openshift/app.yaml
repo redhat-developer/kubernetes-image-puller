@@ -5,12 +5,6 @@ metadata:
     app: kubernetes-image-puller
   name: kubernetes-image-puller
 objects:
-- kind: ServiceAccount
-  apiVersion: v1
-  metadata:
-    labels:
-      app: kubernetes-image-puller
-    name: ${SERVICEACCOUNT_NAME}
 - kind: DeploymentConfig
   apiVersion: v1
   metadata:
@@ -69,10 +63,10 @@ objects:
         serviceAccountName: ${SERVICEACCOUNT_NAME}
 parameters:
 - name: SERVICEACCOUNT_NAME
-  value: kubernetes-image-puller
+  value: rhche
 - name: SERVICE_ACCT_CREDENTIALS_SECRET
-  value: kubernetes-image-puller
+  value: rhche
 - name: IMAGE
-  value: image-caching-test
+  value: quay.io/openshiftio/rhel-kubernetes-image-puller
 - name: IMAGE_TAG
-  value: dev
+  value: latest
