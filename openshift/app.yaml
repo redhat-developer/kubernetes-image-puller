@@ -22,8 +22,8 @@ objects:
       metadata:
         labels:
           app: kubernetes-image-puller
-      spec: 
-        containers: 
+      spec:
+        containers:
         - name: kubernetes-image-puller
           image: ${IMAGE}:${IMAGE_TAG}
           imagePullPolicy: Never
@@ -49,7 +49,7 @@ objects:
           envFrom:
           - configMapRef:
               name: kubernetes-image-puller
-          env: 
+          env:
           - name: SERVICE_ACCOUNT_ID
             valueFrom:
               secretKeyRef:
