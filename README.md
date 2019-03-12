@@ -8,7 +8,7 @@ Fabric8-auth is used to obtain a service account token, which is used along with
 For everything to function, it is necessary to have
 1. A user in fabric8-auth for the serviceaccount used by this app
 1. Users in fabric8-oso-proxy that can be impersonated to create resources on other clusters
-   - These users require `create,delete,watch,get` permissions for `daemonset.apps` in their respective clusters and the specified namespace
+  - These users require `create,delete,watch,get` permissions for `daemonset.apps` in their respective clusters and the specified namespace
 
 To cache images, this app goes through oso-proxy to create daemonsets on desired clusters, which in turn create a pod on each node in the cluster consisting of a list of containers with command `sleep infinity`. This ensures that all nodes in the cluster have those images cached. We also periodically check the health of the daemonset and re-create it if necessary.
 
