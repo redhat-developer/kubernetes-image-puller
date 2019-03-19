@@ -138,7 +138,7 @@ func getContainers() []corev1.Container {
 		containers[idx] = corev1.Container{
 			Name:    name,
 			Image:   image,
-			Command: []string{"/bin/sh", "-c", "sleep infinity"},
+			Command: []string{"/bin/sh", "-c", "sleep", "infinity"},
 		}
 		idx++
 	}

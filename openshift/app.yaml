@@ -30,17 +30,17 @@ objects:
           livenessProbe:
             exec:
               command:
-                - pidof
-                - kubernetes-image-puller
+                - pgrep
+                - /kubernetes-image-puller
             initialDelaySeconds: 5
-            timeoutSeconds: 1
+            timeoutSeconds: 5
           readinessProbe:
             exec:
               command:
-                - pidof
-                - kubernetes-image-puller
+                - pgrep
+                - /kubernetes-image-puller
             initialDelaySeconds: 5
-            timeoutSeconds: 1
+            timeoutSeconds: 5
           resources:
             requests:
               memory: 5Mi
