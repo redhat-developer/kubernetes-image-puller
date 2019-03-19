@@ -30,10 +30,10 @@ var propagationPolicy = metav1.DeletePropagationForeground
 var terminationGracePeriodSeconds = int64(1)
 var cachedImageResources = corev1.ResourceRequirements{
 	Limits: corev1.ResourceList{
-		corev1.ResourceRequestsMemory: resource.MustParse("5Mi"),
+		"memory": resource.MustParse("5Mi"),
 	},
 	Requests: corev1.ResourceList{
-		corev1.ResourceRequestsMemory: resource.MustParse("5Mi"),
+		"memory": resource.MustParse("5Mi"),
 	},
 }
 
