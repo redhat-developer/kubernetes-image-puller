@@ -139,7 +139,7 @@ func getContainers() []corev1.Container {
 			Name:    name,
 			Image:   image,
 			Command: []string{"sleep"},
-			Args:    []string{"infinity"},
+			Args:    []string{"30d"},
 		}
 		idx++
 	}
