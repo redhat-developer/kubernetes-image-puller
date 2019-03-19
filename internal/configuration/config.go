@@ -23,6 +23,7 @@ type Configuration struct {
 	ServiceAccountSecret string
 	OidcProvider         string
 	ProxyURL             string
+	CachingMemRequest    string
 	CachingInterval      int
 }
 
@@ -31,8 +32,8 @@ var Config Configuration
 
 func init() {
 	Config = Configuration{
-		DaemonsetName:        getEnvVarOrExit(daemonsetNameEnvVar),
-		Namespace:            getEnvVarOrExit(namespaceEnvVar),
+		DaemonsetName:        getEnvVarOrDefault(daemonsetNameEnvVar, defaultDaemonsetName),
+		Namespace:            getEnvVarOrDefault(namespaceEnvVar, defaultNamespace),
 		Images:               processImagesEnvVar(),
 		ImpersonateUsers:     processImpersonateUsers(),
 		ServiceAccountID:     getEnvVarOrExit(serviceAccountIDEnvVar),
@@ -40,5 +41,6 @@ func init() {
 		OidcProvider:         getEnvVarOrExit(oidcProviderEnvVar),
 		ProxyURL:             getEnvVarOrExit(proxyURLEnvVar),
 		CachingInterval:      getCachingInterval(),
+		CachingMemRequest:    getEnvVarOrDefault(cachingMemRequestEnvVar, defaultCachingMemRequest),
 	}
 }

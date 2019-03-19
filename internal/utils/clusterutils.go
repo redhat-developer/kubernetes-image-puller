@@ -16,11 +16,10 @@ import (
 	"fmt"
 	"log"
 
-	"k8s.io/apimachinery/pkg/api/resource"
-
 	conf "github.com/redhat-developer/kubernetes-image-puller/internal/configuration"
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
+	"k8s.io/apimachinery/pkg/api/resource"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/watch"
 	"k8s.io/client-go/kubernetes"
@@ -28,14 +27,6 @@ import (
 
 var propagationPolicy = metav1.DeletePropagationForeground
 var terminationGracePeriodSeconds = int64(1)
-var cachedImageResources = corev1.ResourceRequirements{
-	Limits: corev1.ResourceList{
-		"memory": resource.MustParse("5Mi"),
-	},
-	Requests: corev1.ResourceList{
-		"memory": resource.MustParse("5Mi"),
-	},
-}
 
 // Set up watch on daemonset
 func watchDaemonset(clientset *kubernetes.Clientset) watch.Interface {
@@ -144,6 +135,16 @@ func getContainers() []corev1.Container {
 	images := conf.Config.Images
 	containers := make([]corev1.Container, len(images))
 	idx := 0
+
+	cachedImageResources := corev1.ResourceRequirements{
+		Limits: corev1.ResourceList{
+			"memory": resource.MustParse(conf.Config.CachingMemRequest),
+		},
+		Requests: corev1.ResourceList{
+			"memory": resource.MustParse(conf.Config.CachingMemRequest),
+		},
+	}
+
 	for name, image := range images {
 		containers[idx] = corev1.Container{
 			Name:      name,

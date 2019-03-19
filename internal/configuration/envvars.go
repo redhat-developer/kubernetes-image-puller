@@ -30,13 +30,27 @@ const (
 	serviceAccountIDEnvVar     = "SERVICE_ACCOUNT_ID"
 	serviceAccountSecretEnvVar = "SERVICE_ACCOUNT_SECRET"
 	oidcProviderEnvVar         = "OIDC_PROVIDER"
+	cachingMemRequestEnvVar    = "CACHING_MEMORY_REQUEST"
+)
+
+// Default values where applicable
+const (
+	defaultDaemonsetName     = "kubernetes-image-puller"
+	defaultNamespace         = "k8s-image-puller"
+	defaultCachingMemRequest = "30Mi"
+	defaultCachingInterval   = 1
 )
 
 func getCachingInterval() int {
 	cachingIntervalStr := getEnvVarOrExit(intervalEnvVar)
 	interval, err := strconv.Atoi(cachingIntervalStr)
 	if err != nil {
-		log.Fatalf("Could not parse env var %s to integer. Value is %s", intervalEnvVar, cachingIntervalStr)
+		log.Printf(
+			"Could not parse env var %s to integer. Value is %s. Using default of %d",
+			intervalEnvVar,
+			cachingIntervalStr,
+			defaultCachingInterval)
+		return defaultCachingInterval
 	}
 	return interval
 }
@@ -80,6 +94,14 @@ func getEnvVarOrExit(envVar string) string {
 	val := os.Getenv(envVar)
 	if val == "" {
 		log.Fatalf("Env var %s unset. Aborting", envVar)
+	}
+	return val
+}
+
+func getEnvVarOrDefault(envVar, defaultValue string) string {
+	val := os.Getenv(envVar)
+	if val == "" {
+		val = defaultValue
 	}
 	return val
 }

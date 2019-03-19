@@ -14,3 +14,4 @@ data:
   OIDC_PROVIDER: "https://auth.prod-preview.openshift.io/api"
   NAMESPACE: "k8s-image-puller"
   IMPERSONATE_USERS: "osio-ci-ee3-preview"
+  CACHING_MEMORY_REQUEST: "30Mi"
