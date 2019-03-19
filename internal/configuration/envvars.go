@@ -101,6 +101,7 @@ func getEnvVarOrExit(envVar string) string {
 func getEnvVarOrDefault(envVar, defaultValue string) string {
 	val := os.Getenv(envVar)
 	if val == "" {
+		log.Printf("No value found for %s. Using default value of %s", envVar, defaultValue)
 		val = defaultValue
 	}
 	return val
