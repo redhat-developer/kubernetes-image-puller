@@ -31,6 +31,7 @@ objects:
             exec:
               command:
                 - pgrep
+                - -f
                 - /kubernetes-image-puller
             initialDelaySeconds: 5
             timeoutSeconds: 5
@@ -38,6 +39,7 @@ objects:
             exec:
               command:
                 - pgrep
+                - -f
                 - /kubernetes-image-puller
             initialDelaySeconds: 5
             timeoutSeconds: 5
