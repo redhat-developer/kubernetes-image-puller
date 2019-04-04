@@ -25,6 +25,7 @@ type Configuration struct {
 	ProxyURL             string
 	CachingMemRequest    string
 	CachingInterval      int
+	MultiCluster         bool
 }
 
 // Config stores the configuration from env vars
@@ -42,5 +43,6 @@ func init() {
 		ProxyURL:             getEnvVarOrExit(proxyURLEnvVar),
 		CachingInterval:      getCachingInterval(),
 		CachingMemRequest:    getEnvVarOrDefault(cachingMemRequestEnvVar, defaultCachingMemRequest),
+		MultiCluster:         getEnvVarOrDefaultBool(multiCluster, defaultMultiCluster),
 	}
 }
