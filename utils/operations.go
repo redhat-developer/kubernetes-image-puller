@@ -15,7 +15,7 @@ package utils
 import (
 	"log"
 
-	conf "github.com/redhat-developer/kubernetes-image-puller/internal/configuration"
+	"github.com/redhat-developer/kubernetes-image-puller/cfg"
 	"k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
@@ -36,8 +36,8 @@ func EnsureDaemonsetExists(clientset *kubernetes.Clientset) {
 	daemonset, err :=
 		clientset.
 			AppsV1().
-			DaemonSets(conf.Config.Namespace).
-			Get(conf.Config.DaemonsetName, metav1.GetOptions{})
+			DaemonSets(cfg.Namespace).
+			Get(cfg.DaemonsetName, metav1.GetOptions{})
 	if err != nil || daemonset == nil {
 		log.Printf("Recreating daemonset due to error")
 		DeleteDaemonsetIfExists(clientset)
@@ -52,8 +52,8 @@ func DeleteDaemonsetIfExists(clientset *kubernetes.Clientset) {
 	daemonset, err :=
 		clientset.
 			AppsV1().
-			DaemonSets(conf.Config.Namespace).
-			Get(conf.Config.DaemonsetName, metav1.GetOptions{})
+			DaemonSets(cfg.Namespace).
+			Get(cfg.DaemonsetName, metav1.GetOptions{})
 	if errors.IsNotFound(err) {
 		return
 	} else if statusError, isStatus := err.(*errors.StatusError); isStatus {

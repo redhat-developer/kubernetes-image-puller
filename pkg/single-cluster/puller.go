@@ -8,8 +8,8 @@ import (
 	"syscall"
 	"time"
 
-	conf "github.com/redhat-developer/kubernetes-image-puller/internal/configuration"
-	"github.com/redhat-developer/kubernetes-image-puller/internal/utils"
+	"github.com/redhat-developer/kubernetes-image-puller/cfg"
+	"github.com/redhat-developer/kubernetes-image-puller/utils"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
 )
@@ -52,7 +52,7 @@ func cacheImagesLocally(config *rest.Config,
 			log.Printf("Received SIGTERM, deleting daemonset")
 			utils.DeleteDaemonsetIfExists(clientset)
 			wg.Done()
-		case <-time.After(time.Duration(conf.Config.CachingInterval) * time.Hour):
+		case <-time.After(time.Duration(cfg.CachingInterval) * time.Hour):
 			utils.EnsureDaemonsetExists(clientset)
 		}
 	}

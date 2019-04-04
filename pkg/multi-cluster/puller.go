@@ -8,8 +8,8 @@ import (
 	"syscall"
 	"time"
 
-	conf "github.com/redhat-developer/kubernetes-image-puller/internal/configuration"
-	"github.com/redhat-developer/kubernetes-image-puller/internal/utils"
+	"github.com/redhat-developer/kubernetes-image-puller/cfg"
+	"github.com/redhat-developer/kubernetes-image-puller/utils"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
 )
@@ -25,18 +25,18 @@ func CacheImages() {
 
 	// Shared config to use osoproxy
 	config.BearerToken = utils.GetServiceAccountToken(
-		conf.Config.ServiceAccountID,
-		conf.Config.ServiceAccountSecret,
-		conf.Config.OidcProvider,
+		cfg.ServiceAccountID,
+		cfg.ServiceAccountSecret,
+		cfg.OidcProvider,
 	)
-	config.Host = conf.Config.ProxyURL
+	config.Host = cfg.ProxyURL
 	config.TLSClientConfig = rest.TLSClientConfig{
 		Insecure: true,
 	}
 
 	var wg sync.WaitGroup
-	wg.Add(len(conf.Config.ImpersonateUsers))
-	for _, user := range conf.Config.ImpersonateUsers {
+	wg.Add(len(cfg.ImpersonateUsers))
+	for _, user := range cfg.ImpersonateUsers {
 		var shutdownChan = make(chan os.Signal, 1)
 		signal.Notify(shutdownChan, syscall.SIGTERM)
 
@@ -73,7 +73,7 @@ func cacheImagesForUser(impersonateUser string,
 			log.Printf("Received SIGTERM, deleting daemonset")
 			utils.DeleteDaemonsetIfExists(clientset)
 			wg.Done()
-		case <-time.After(time.Duration(conf.Config.CachingInterval) * time.Hour):
+		case <-time.After(time.Duration(cfg.CachingInterval) * time.Hour):
 			utils.EnsureDaemonsetExists(clientset)
 		}
 	}

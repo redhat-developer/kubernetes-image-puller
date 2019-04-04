@@ -10,7 +10,7 @@
 //   Red Hat, Inc. - initial API and implementation
 //
 
-package configuration
+package cfg
 
 import (
 	"log"
@@ -31,7 +31,7 @@ const (
 	serviceAccountSecretEnvVar = "SERVICE_ACCOUNT_SECRET"
 	oidcProviderEnvVar         = "OIDC_PROVIDER"
 	cachingMemRequestEnvVar    = "CACHING_MEMORY_REQUEST"
-	multiCluster               = "MULTI_CLUSTER"
+	multiCluster               = "MULTICLUSTER"
 )
 
 // Default values where applicable

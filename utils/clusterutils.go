@@ -16,7 +16,7 @@ import (
 	"fmt"
 	"log"
 
-	conf "github.com/redhat-developer/kubernetes-image-puller/internal/configuration"
+	"github.com/redhat-developer/kubernetes-image-puller/cfg"
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
@@ -30,8 +30,8 @@ var terminationGracePeriodSeconds = int64(1)
 
 // Set up watch on daemonset
 func watchDaemonset(clientset *kubernetes.Clientset) watch.Interface {
-	watch, err := clientset.AppsV1().DaemonSets(conf.Config.Namespace).Watch(metav1.ListOptions{
-		FieldSelector:        fmt.Sprintf("metadata.name=%s", conf.Config.DaemonsetName),
+	watch, err := clientset.AppsV1().DaemonSets(cfg.Namespace).Watch(metav1.ListOptions{
+		FieldSelector:        fmt.Sprintf("metadata.name=%s", cfg.DaemonsetName),
 		IncludeUninitialized: true,
 	})
 	if err != nil {
@@ -46,7 +46,7 @@ func createDaemonset(clientset *kubernetes.Clientset) error {
 	log.Printf("Creating daemonset")
 	toCreate := &appsv1.DaemonSet{
 		ObjectMeta: metav1.ObjectMeta{
-			Name: conf.Config.DaemonsetName,
+			Name: cfg.DaemonsetName,
 		},
 		Spec: appsv1.DaemonSetSpec{
 			Selector: &metav1.LabelSelector{
@@ -72,7 +72,7 @@ func createDaemonset(clientset *kubernetes.Clientset) error {
 	defer dsWatch.Stop()
 	watchChan := dsWatch.ResultChan()
 
-	_, err := clientset.AppsV1().DaemonSets(conf.Config.Namespace).Create(toCreate)
+	_, err := clientset.AppsV1().DaemonSets(cfg.Namespace).Create(toCreate)
 	if err != nil {
 		log.Fatalf("Failed to create daemonset: %s", err.Error())
 	} else {
@@ -109,13 +109,13 @@ func deleteDaemonset(clientset *kubernetes.Clientset) {
 	defer dsWatch.Stop()
 	watchChan := dsWatch.ResultChan()
 
-	err := clientset.AppsV1().DaemonSets(conf.Config.Namespace).Delete(conf.Config.DaemonsetName, &metav1.DeleteOptions{
+	err := clientset.AppsV1().DaemonSets(cfg.Namespace).Delete(cfg.DaemonsetName, &metav1.DeleteOptions{
 		PropagationPolicy: &propagationPolicy,
 	})
 	if err != nil {
 		log.Fatalf("Failed to delete daemonset %s", err.Error())
 	} else {
-		log.Printf("Deleted daemonset %s", conf.Config.DaemonsetName)
+		log.Printf("Deleted daemonset %s", cfg.DaemonsetName)
 	}
 	waitDaemonsetDeleted(watchChan)
 }
@@ -132,16 +132,16 @@ func waitDaemonsetDeleted(c <-chan watch.Event) {
 
 // Get array of all images in containers to be cached.
 func getContainers() []corev1.Container {
-	images := conf.Config.Images
+	images := cfg.Images
 	containers := make([]corev1.Container, len(images))
 	idx := 0
 
 	cachedImageResources := corev1.ResourceRequirements{
 		Limits: corev1.ResourceList{
-			"memory": resource.MustParse(conf.Config.CachingMemRequest),
+			"memory": resource.MustParse(cfg.CachingMemRequest),
 		},
 		Requests: corev1.ResourceList{
-			"memory": resource.MustParse(conf.Config.CachingMemRequest),
+			"memory": resource.MustParse(cfg.CachingMemRequest),
 		},
 	}
 
