@@ -31,6 +31,7 @@ const (
 	serviceAccountSecretEnvVar = "SERVICE_ACCOUNT_SECRET"
 	oidcProviderEnvVar         = "OIDC_PROVIDER"
 	cachingMemRequestEnvVar    = "CACHING_MEMORY_REQUEST"
+	multiCluster               = "MULTI_CLUSTER"
 )
 
 // Default values where applicable
@@ -39,6 +40,7 @@ const (
 	defaultNamespace         = "k8s-image-puller"
 	defaultCachingMemRequest = "30Mi"
 	defaultCachingInterval   = 1
+	defaultMultiCluster      = true
 )
 
 func getCachingInterval() int {
@@ -102,6 +104,15 @@ func getEnvVarOrDefault(envVar, defaultValue string) string {
 	val := os.Getenv(envVar)
 	if val == "" {
 		log.Printf("No value found for %s. Using default value of %s", envVar, defaultValue)
+		val = defaultValue
+	}
+	return val
+}
+
+func getEnvVarOrDefaultBool(envVar string, defaultValue bool) bool {
+	envvar := os.Getenv(envVar)
+	val, err := strconv.ParseBool(envvar)
+	if err != nil {
 		val = defaultValue
 	}
 	return val
