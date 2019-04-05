@@ -1,0 +1,20 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: k8s-image-puller
+type: Opaque
+data:
+  IMAGES: >
+    che-theia=eclipse/che-theia:0.3.19-nightly;
+    che-dev=eclipse/che-dev:nightly;
+    jwt-proxy=eclipse/che-jwtproxy:latest;
+  DAEMONSET_NAME: "kubernetes-image-puller"
+  CACHING_INTERVAL_HOURS: "1"
+  OPENSHIFT_PROXY_URL: "ignored"
+  OIDC_PROVIDER: "ignored"
+  NAMESPACE: "k8s-image-puller"
+  IMPERSONATE_USERS: "ignored"
+  CACHING_MEMORY_REQUEST: "30Mi"
+  SERVICE_ACCOUNT_ID: "ignored"
+  SERVICE_ACCOUNT_SECRET: "ignored"
+  MULTICLUSTER: "false"
