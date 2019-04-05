@@ -19,12 +19,13 @@ The config values to be set are
 | Env Var | Usage |
 | -- | -- |
 | `CACHING_INTERVAL_HOURS` | Interval, in hours, between checking health of daemonsets |
-|	`DAEMONSET_NAME`         | Name of daemonset to be created |
-|	`NAMESPACE`              | Namespace where daemonset is to be created. Shared for all users |
-|	`IMPERSONATE_USERS`      | Comma-separated list of users to impersonate when creating daemonsets |
-|	`OPENSHIFT_PROXY_URL`    | URL of oso-proxy |
-|	`IMAGES`                 | List of images to be cached, in the format `<name>=<image>;...` |
-|	`OIDC_PROVIDER`          | URL of token provider for service account |
+| `DAEMONSET_NAME`         | Name of daemonset to be created |
+| `NAMESPACE`              | Namespace where daemonset is to be created. Shared for all users |
+| `IMPERSONATE_USERS`      | Comma-separated list of users to impersonate when creating daemonsets |
+| `OPENSHIFT_PROXY_URL`    | URL of oso-proxy |
+| `IMAGES`                 | List of images to be cached, in the format `<name>=<image>;...` |
+| `OIDC_PROVIDER`          | URL of token provider for service account |
+| `MULTICLUSTER`           | Run in multi cluster mode; default is true |
 
 Additionally, `./openshift/app.yaml` has a few parameters:
 
@@ -69,3 +70,19 @@ Make docker image:
 ```bash
 docker build -t ${DOCKERIMAGE_NAME}:${DOCKERIMAGE_TAG} .
 ```
+
+## Testing locally
+It's possible to run a simplified version of kubernetes-image-puller locally in minishift. This version avoids most of the complexity in the `oso-proxy` version, so its usefulness is limited.
+
+Note: to run the commands below, you will need to be an admin user.
+
+```
+oc adm policy add-cluster-role-to-user cluster-admin admin
+oc login -u admin -p any
+oc new-project k8s-image-puller
+make docker
+make local-setup
+make local-deploy
+```
+
+This uses the `yaml` files in the `./deploy` directory to create a kubernetes image puller locally, that, in turn, creates a daemonset in the current namespace.
