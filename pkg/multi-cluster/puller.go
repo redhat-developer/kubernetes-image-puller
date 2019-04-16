@@ -52,7 +52,7 @@ func cacheImagesForUser(impersonateUser string,
 	shutdownChan chan os.Signal,
 	wg *sync.WaitGroup) {
 
-	log.Printf("Starting caching process for impersonate user %s", impersonateUser)
+	log.Printf("Starting caching process for impersonate user '%s'", impersonateUser)
 	config.Impersonate = rest.ImpersonationConfig{
 		UserName: impersonateUser,
 	}
