@@ -89,6 +89,9 @@ func processImpersonateUsers() []string {
 	if len(users) == 0 {
 		log.Fatalf("No users found in env var %s", impersonateUsersEnvVar)
 	}
+	for idx := range users {
+		users[idx] = strings.TrimSpace(users[idx])
+	}
 	return users
 }
 
