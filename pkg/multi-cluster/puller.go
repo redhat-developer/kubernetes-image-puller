@@ -66,6 +66,7 @@ func cacheImagesForUser(impersonateUser string,
 	utils.DeleteDaemonsetIfExists(clientset)
 	// Create daemonset to cache images
 	utils.CacheImages(clientset)
+	utils.LogNumNodesScheduled(clientset, impersonateUser)
 
 	for {
 		select {
@@ -74,6 +75,8 @@ func cacheImagesForUser(impersonateUser string,
 			utils.DeleteDaemonsetIfExists(clientset)
 			wg.Done()
 		case <-time.After(time.Duration(cfg.CachingInterval) * time.Hour):
+			log.Printf("Checking daemonset for user '%s'", impersonateUser)
+			utils.LogNumNodesScheduled(clientset, impersonateUser)
 			utils.EnsureDaemonsetExists(clientset)
 		}
 	}

@@ -66,3 +66,21 @@ func DeleteDaemonsetIfExists(clientset *kubernetes.Clientset) {
 		log.Printf("Deleted existing daemonset")
 	}
 }
+
+// LogNumNodesScheduled logs the basic status of the daemonset.
+func LogNumNodesScheduled(clientset *kubernetes.Clientset, user string) {
+	daemonset, err :=
+		clientset.
+			AppsV1().
+			DaemonSets(cfg.Namespace).
+			Get(cfg.DaemonsetName, metav1.GetOptions{})
+	if err != nil {
+		log.Printf("Failed to get daemonset for user '%s': %s", user, err)
+	}
+	if daemonset != nil {
+		log.Printf("Daemonset for user '%s': Ready: %d, Desired: %d",
+			user,
+			daemonset.Status.NumberReady,
+			daemonset.Status.DesiredNumberScheduled)
+	}
+}

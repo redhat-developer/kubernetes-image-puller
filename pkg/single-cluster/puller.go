@@ -45,6 +45,7 @@ func cacheImagesLocally(config *rest.Config,
 	utils.DeleteDaemonsetIfExists(clientset)
 	// Create daemonset to cache images
 	utils.CacheImages(clientset)
+	utils.LogNumNodesScheduled(clientset, "")
 
 	for {
 		select {
@@ -53,6 +54,7 @@ func cacheImagesLocally(config *rest.Config,
 			utils.DeleteDaemonsetIfExists(clientset)
 			wg.Done()
 		case <-time.After(time.Duration(cfg.CachingInterval) * time.Hour):
+			utils.LogNumNodesScheduled(clientset, "")
 			utils.EnsureDaemonsetExists(clientset)
 		}
 	}
