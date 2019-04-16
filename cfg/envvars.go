@@ -31,6 +31,7 @@ const (
 	serviceAccountSecretEnvVar = "SERVICE_ACCOUNT_SECRET"
 	oidcProviderEnvVar         = "OIDC_PROVIDER"
 	cachingMemRequestEnvVar    = "CACHING_MEMORY_REQUEST"
+	cachingMemLimitEnvVar      = "CACHING_MEMORY_LIMIT"
 	multiCluster               = "MULTICLUSTER"
 )
 
@@ -38,7 +39,8 @@ const (
 const (
 	defaultDaemonsetName     = "kubernetes-image-puller"
 	defaultNamespace         = "k8s-image-puller"
-	defaultCachingMemRequest = "30Mi"
+	defaultCachingMemRequest = "1Mi"
+	defaultCachingMemLimit   = "5Mi"
 	defaultCachingInterval   = 1
 	defaultMultiCluster      = true
 )

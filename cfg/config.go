@@ -22,6 +22,7 @@ var (
 	OidcProvider         string
 	ProxyURL             string
 	CachingMemRequest    string
+	CachingMemLimit      string
 	CachingInterval      int
 	MultiCluster         bool
 )
@@ -37,5 +38,6 @@ func init() {
 	ProxyURL = getEnvVarOrExit(proxyURLEnvVar)
 	CachingInterval = getCachingInterval()
 	CachingMemRequest = getEnvVarOrDefault(cachingMemRequestEnvVar, defaultCachingMemRequest)
+	CachingMemLimit = getEnvVarOrDefault(cachingMemLimitEnvVar, defaultCachingMemLimit)
 	MultiCluster = getEnvVarOrDefaultBool(multiCluster, defaultMultiCluster)
 }
