@@ -12,7 +12,7 @@ objects:
       app: kubernetes-image-puller
     name: kubernetes-image-puller
   spec:
-    replicas: 1
+    replicas: ${{REPLICAS}}
     revisionHistoryLimit: 2
     selector:
       app: kubernetes-image-puller
@@ -72,3 +72,5 @@ parameters:
   value: quay.io/openshiftio/rhel-kubernetes-image-puller
 - name: IMAGE_TAG
   value: latest
+- name: REPLICAS
+  value: "3"
