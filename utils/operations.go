@@ -29,6 +29,15 @@ func CacheImages(clientset *kubernetes.Clientset) {
 	log.Printf("Daemonset ready.")
 }
 
+// RefreshCache forces a refresh of all pods in the daemonset, to ensure images
+// with mutable tags (e.g. nightlies) are up-to-date.
+func RefreshCache(clientset *kubernetes.Clientset) {
+	log.Printf("Refreshing cached images")
+	DeleteDaemonsetIfExists(clientset)
+	createDaemonset(clientset)
+	log.Printf("Refreshed images")
+}
+
 // EnsureDaemonsetExists checks that the daemonset is still present, and
 // recreates it if necessary
 func EnsureDaemonsetExists(clientset *kubernetes.Clientset) {
