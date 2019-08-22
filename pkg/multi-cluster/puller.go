@@ -76,8 +76,8 @@ func cacheImagesForUser(impersonateUser string,
 			wg.Done()
 		case <-time.After(time.Duration(cfg.CachingInterval) * time.Hour):
 			log.Printf("Checking daemonset for user '%s'", impersonateUser)
+			utils.RefreshCache(clientset)
 			utils.LogNumNodesScheduled(clientset, impersonateUser)
-			utils.EnsureDaemonsetExists(clientset)
 		}
 	}
 }

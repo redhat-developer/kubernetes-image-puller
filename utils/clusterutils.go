@@ -85,17 +85,26 @@ func createDaemonset(clientset *kubernetes.Clientset) error {
 // Wait for daemonset to be ready (MODIFIED event with all nodes scheduled)
 func waitDaemonsetReady(c <-chan watch.Event) {
 	log.Printf("Waiting for daemonset to be ready")
-	for ev := range c {
-		log.Printf("(DEBUG) Create watch event received: %s", ev.Type)
-		if ev.Type == watch.Modified {
-			daemonset := ev.Object.(*appsv1.DaemonSet)
-			// TODO: Not sure if this is the correct logic
-			if daemonset.Status.NumberReady == daemonset.Status.DesiredNumberScheduled {
-				log.Printf("All nodes scheduled in daemonset")
+	for {
+		select {
+		case ev, ok := <-c:
+			if !ok {
+				log.Printf("WARN: Watch closed before deamonset ready")
 				return
 			}
-		} else if ev.Type == watch.Deleted {
-			log.Fatalf("Error occurred while waiting for daemonset to be ready -- event %s detected", watch.Deleted)
+			// log.Printf("(DEBUG) Create watch event received: %s", ev.Type)
+			if ev.Type == watch.Modified {
+				daemonset := ev.Object.(*appsv1.DaemonSet)
+				// TODO: Not sure if this is the correct logic
+				if daemonset.Status.NumberReady == daemonset.Status.DesiredNumberScheduled {
+					log.Printf("%d/%d nodes ready in daemonset", daemonset.Status.NumberReady, daemonset.Status.DesiredNumberScheduled)
+					return
+				} else {
+					log.Printf("%d/%d nodes ready", daemonset.Status.NumberReady, daemonset.Status.DesiredNumberScheduled)
+				}
+			} else if ev.Type == watch.Deleted || ev.Type == watch.Error {
+				log.Fatalf("Error occurred while waiting for daemonset to be ready -- event %s detected", watch.Deleted)
+			}
 		}
 	}
 }
@@ -122,10 +131,17 @@ func deleteDaemonset(clientset *kubernetes.Clientset) {
 
 // Use watch channel to wait for DELETED event on daemonset, then return
 func waitDaemonsetDeleted(c <-chan watch.Event) {
-	for ev := range c {
-		log.Printf("(DEBUG) Delete watch event received: %s", ev.Type)
-		if ev.Type == watch.Deleted {
-			return
+	for {
+		select {
+		case ev, ok := <-c:
+			if !ok {
+				log.Printf("WARN: Watch closed before deamonset deleted")
+				return
+			}
+			log.Printf("(DEBUG) Delete watch event received: %s", ev.Type)
+			if ev.Type == watch.Deleted {
+				return
+			}
 		}
 	}
 }
