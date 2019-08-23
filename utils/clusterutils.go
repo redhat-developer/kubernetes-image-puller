@@ -163,11 +163,12 @@ func getContainers() []corev1.Container {
 
 	for name, image := range images {
 		containers[idx] = corev1.Container{
-			Name:      name,
-			Image:     image,
-			Command:   []string{"sleep"},
-			Args:      []string{"30d"},
-			Resources: cachedImageResources,
+			Name:            name,
+			Image:           image,
+			Command:         []string{"sleep"},
+			Args:            []string{"30d"},
+			Resources:       cachedImageResources,
+			ImagePullPolicy: corev1.PullAlways,
 		}
 		idx++
 	}
