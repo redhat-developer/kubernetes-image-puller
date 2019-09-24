@@ -15,6 +15,7 @@ package utils
 import (
 	"fmt"
 	"log"
+	"time"
 
 	"github.com/redhat-developer/kubernetes-image-puller/cfg"
 	appsv1 "k8s.io/api/apps/v1"
@@ -78,19 +79,23 @@ func createDaemonset(clientset *kubernetes.Clientset) error {
 	} else {
 		log.Printf("Created daemonset")
 	}
-	waitDaemonsetReady(watchChan)
+	watchErr := waitDaemonsetReady(watchChan)
+	if watchErr != nil {
+		log.Printf("Unable to watch daemonset for readiness, falling back to manually checking.")
+		checkDaemonsetReadiness(clientset)
+	}
 	return err
 }
 
 // Wait for daemonset to be ready (MODIFIED event with all nodes scheduled)
-func waitDaemonsetReady(c <-chan watch.Event) {
+func waitDaemonsetReady(c <-chan watch.Event) error {
 	log.Printf("Waiting for daemonset to be ready")
 	for {
 		select {
 		case ev, ok := <-c:
 			if !ok {
 				log.Printf("WARN: Watch closed before deamonset ready")
-				return
+				return fmt.Errorf("Watch closed before deamonset ready")
 			}
 			// log.Printf("(DEBUG) Create watch event received: %s", ev.Type)
 			if ev.Type == watch.Modified {
@@ -98,15 +103,38 @@ func waitDaemonsetReady(c <-chan watch.Event) {
 				// TODO: Not sure if this is the correct logic
 				if daemonset.Status.NumberReady == daemonset.Status.DesiredNumberScheduled {
 					log.Printf("%d/%d nodes ready in daemonset", daemonset.Status.NumberReady, daemonset.Status.DesiredNumberScheduled)
-					return
-				} else {
-					log.Printf("%d/%d nodes ready", daemonset.Status.NumberReady, daemonset.Status.DesiredNumberScheduled)
+					return nil
 				}
+				log.Printf("%d/%d nodes ready", daemonset.Status.NumberReady, daemonset.Status.DesiredNumberScheduled)
 			} else if ev.Type == watch.Deleted || ev.Type == watch.Error {
 				log.Fatalf("Error occurred while waiting for daemonset to be ready -- event %s detected", watch.Deleted)
 			}
 		}
 	}
+}
+
+func checkDaemonsetReadiness(clientset *kubernetes.Clientset) {
+	// Loop 10 times, sleeping for 3 seconds each time
+	for i := 0; i < 10; i++ {
+		ds, err := clientset.AppsV1().DaemonSets(cfg.Namespace).Get(cfg.DaemonsetName, metav1.GetOptions{
+			// IncludeUninitialized: true,
+		})
+		if err != nil {
+			log.Printf("WARN: could not get daemonset: %s", err)
+			return
+		}
+		if ds.Status.DesiredNumberScheduled == 0 {
+			// We've received a daemonset during initialization
+			continue
+		}
+		log.Printf("%d/%d nodes ready in daemonset", ds.Status.NumberReady, ds.Status.DesiredNumberScheduled)
+		if ds.Status.NumberReady == ds.Status.DesiredNumberScheduled {
+			log.Printf("All nodes running")
+			return
+		}
+		time.Sleep(3 * time.Second)
+	}
+	log.Printf("Maximum duration for readiness checking exceeded.")
 }
 
 // Delete daemonset with metadata.name daemonsetName. Blocks until daemonset
