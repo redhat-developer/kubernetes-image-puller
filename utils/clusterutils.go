@@ -63,6 +63,7 @@ func createDaemonset(clientset *kubernetes.Clientset) error {
 					Name: "test-po",
 				},
 				Spec: corev1.PodSpec{
+					NodeSelector:                  cfg.NodeSelector,
 					TerminationGracePeriodSeconds: &terminationGracePeriodSeconds,
 					Containers:                    getContainers(),
 				},
