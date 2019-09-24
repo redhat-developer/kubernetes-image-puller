@@ -16,3 +16,4 @@ data:
   IMPERSONATE_USERS: "osio-ci-ee3-preview"
   CACHING_MEMORY_REQUEST: "1Mi"
   CACHING_MEMORY_LIMIT: "5Mi"
+  NODE_SELECTOR: "{}"

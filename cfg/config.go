@@ -25,6 +25,7 @@ var (
 	CachingMemLimit      string
 	CachingInterval      int
 	MultiCluster         bool
+	NodeSelector         map[string]string
 )
 
 func init() {
@@ -40,4 +41,5 @@ func init() {
 	CachingMemRequest = getEnvVarOrDefault(cachingMemRequestEnvVar, defaultCachingMemRequest)
 	CachingMemLimit = getEnvVarOrDefault(cachingMemLimitEnvVar, defaultCachingMemLimit)
 	MultiCluster = getEnvVarOrDefaultBool(multiCluster, defaultMultiCluster)
+	NodeSelector = processNodeSelectorEnvVar()
 }

@@ -19,3 +19,4 @@ data:
   SERVICE_ACCOUNT_ID: "ignored"
   SERVICE_ACCOUNT_SECRET: "ignored"
   MULTICLUSTER: "false"
+  NODE_SELECTOR: "{}"

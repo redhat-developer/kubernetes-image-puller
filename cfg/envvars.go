@@ -13,6 +13,7 @@
 package cfg
 
 import (
+	"encoding/json"
 	"log"
 	"os"
 	"strconv"
@@ -33,6 +34,7 @@ const (
 	cachingMemRequestEnvVar    = "CACHING_MEMORY_REQUEST"
 	cachingMemLimitEnvVar      = "CACHING_MEMORY_LIMIT"
 	multiCluster               = "MULTICLUSTER"
+	nodeSelectorEnvVar         = "NODE_SELECTOR"
 )
 
 // Default values where applicable
@@ -43,6 +45,7 @@ const (
 	defaultCachingMemLimit   = "5Mi"
 	defaultCachingInterval   = 1
 	defaultMultiCluster      = true
+	defaultNodeSelector      = "{}"
 )
 
 func getCachingInterval() int {
@@ -83,6 +86,16 @@ func processImagesEnvVar() map[string]string {
 		imagesMap[nameAndImage[0]] = nameAndImage[1]
 	}
 	return imagesMap
+}
+
+func processNodeSelectorEnvVar() map[string]string {
+	rawNodeSelector := getEnvVarOrDefault(nodeSelectorEnvVar, defaultNodeSelector)
+	nodeSelector := make(map[string]string)
+	err := json.Unmarshal([]byte(rawNodeSelector), &nodeSelector)
+	if err != nil {
+		log.Fatalf("Failed to unmarshal node selector json: %s", err)
+	}
+	return nodeSelector
 }
 
 func processImpersonateUsers() []string {
