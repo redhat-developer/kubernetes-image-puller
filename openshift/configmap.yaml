@@ -5,7 +5,6 @@ metadata:
 type: Opaque
 data:
   IMAGES: >
-    jwtproxy=eclipse/che-jwtproxy:latest;
     java11-maven=quay.io/eclipse/che-java11-maven:nightly;
     che-theia=eclipse/che-theia:7.0.0;
     java-plugin-runner=eclipse/che-remote-plugin-runner-java8:7.0.0;

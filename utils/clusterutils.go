@@ -115,8 +115,8 @@ func waitDaemonsetReady(c <-chan watch.Event) error {
 }
 
 func checkDaemonsetReadiness(clientset *kubernetes.Clientset) {
-	// Loop 10 times, sleeping for 3 seconds each time
-	for i := 0; i < 10; i++ {
+	// Loop 30 times, sleeping for 3 seconds each time -- 90 seconds total wait.
+	for i := 0; i < 30; i++ {
 		ds, err := clientset.AppsV1().DaemonSets(cfg.Namespace).Get(cfg.DaemonsetName, metav1.GetOptions{
 			// IncludeUninitialized: true,
 		})
