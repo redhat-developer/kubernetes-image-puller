@@ -6,8 +6,8 @@ type: Opaque
 data:
   IMAGES: >
     java11-maven=quay.io/eclipse/che-java11-maven:nightly;
-    che-theia=eclipse/che-theia:7.0.0;
-    java-plugin-runner=eclipse/che-remote-plugin-runner-java8:7.0.0;
+    sidecar-java=quay.io/eclipse/che-sidecar-java:11;
+    che-theia=eclipse/che-theia:7.8.0;
   DAEMONSET_NAME: "kubernetes-image-puller"
   CACHING_INTERVAL_HOURS: "1"
   OPENSHIFT_PROXY_URL: "https://osoproxy.prod-preview.openshift.io"
