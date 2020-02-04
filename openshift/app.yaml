@@ -25,7 +25,7 @@ objects:
       spec:
         containers:
         - name: kubernetes-image-puller
-          image: ${IMAGE}:${IMAGE_TAG}
+          image: "${IMAGE}:${IMAGE_TAG}"
           imagePullPolicy: IfNotPresent
           livenessProbe:
             exec:
