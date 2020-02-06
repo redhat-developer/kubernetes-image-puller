@@ -20,6 +20,7 @@ import (
 	"github.com/redhat-developer/kubernetes-image-puller/cfg"
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
+	"k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/api/resource"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/watch"
@@ -135,7 +136,7 @@ func checkDaemonsetReadiness(clientset *kubernetes.Clientset) {
 		}
 		time.Sleep(3 * time.Second)
 	}
-	log.Printf("Maximum duration for readiness checking exceeded.")
+	log.Printf("WARN: maximum duration for readiness checking exceeded.")
 }
 
 // Delete daemonset with metadata.name daemonsetName. Blocks until daemonset
@@ -153,26 +154,52 @@ func deleteDaemonset(clientset *kubernetes.Clientset) {
 	if err != nil {
 		log.Fatalf("Failed to delete daemonset %s", err.Error())
 	} else {
-		log.Printf("Deleted daemonset %s", cfg.DaemonsetName)
+		log.Printf("Marked daemonset %s for removal", cfg.DaemonsetName)
 	}
-	waitDaemonsetDeleted(watchChan)
+	watchErr := waitDaemonsetDeleted(watchChan)
+	if watchErr != nil {
+		// The watch was closed prematurely so we don't know if the daemonset has actually been removed
+		// We have to ensure it's gone before trying to create a new one.
+		log.Printf("WARN: error while waiting for daemonset deletion: %s", watchErr)
+		log.Printf("Manually ensuring daemonset is deleted.")
+		err = checkDaemonsetDeleted(clientset)
+		if err != nil {
+			log.Fatalf("FATAL: could not verify that daemonset is deleted: %s", err)
+		}
+	}
+	log.Printf("Deleted daemonset %s", cfg.DaemonsetName)
 }
 
 // Use watch channel to wait for DELETED event on daemonset, then return
-func waitDaemonsetDeleted(c <-chan watch.Event) {
+func waitDaemonsetDeleted(c <-chan watch.Event) error {
 	for {
 		select {
 		case ev, ok := <-c:
 			if !ok {
 				log.Printf("WARN: Watch closed before deamonset deleted")
-				return
+				return fmt.Errorf("watch closed before daemonset deleted")
 			}
 			log.Printf("(DEBUG) Delete watch event received: %s", ev.Type)
 			if ev.Type == watch.Deleted {
-				return
+				return nil
 			}
 		}
 	}
+}
+
+func checkDaemonsetDeleted(clientset *kubernetes.Clientset) error {
+	// Loop 60 times, sleeping for 3 seconds each time -- 180 seconds maximum wait.
+	for i := 0; i < 60; i++ {
+		_, err := clientset.AppsV1().DaemonSets(cfg.Namespace).Get(cfg.DaemonsetName, metav1.GetOptions{
+			IncludeUninitialized: true,
+		})
+		if errors.IsNotFound(err) {
+			// daemonset has been deleted
+			return nil
+		}
+		time.Sleep(3 * time.Second)
+	}
+	return fmt.Errorf("timeout expired while checking that daemonset is deleted")
 }
 
 // Get array of all images in containers to be cached.
