@@ -33,16 +33,8 @@ COPY --from=builder /etc/passwd /etc/passwd
 
 USER appuser
 COPY --from=builder /go/src/github.com/redhat-developer/kubernetes-image-puller/bin/kubernetes-image-puller / 
-# TODO need at least these ENV vars to be set when using the image puller; what defaults should we set in the container? 
-# export IMAGES=?
-# export IMPERSONATE_USERS=?
-# export SERVICE_ACCOUNT_ID=?
-# export SERVICE_ACCOUNT_SECRET=?
-# export OIDC_PROVIDER=?
-# export OPENSHIFT_PROXY_URL=?
-# export CACHING_INTERVAL_HOURS=?
-# export KUBERNETES_SERVICE_HOST=?
-# export KUBERNETES_SERVICE_POST=?
+# NOTE: To use this container, need a configmap. See example at ./deploy/configmap.yaml
+# See also https://github.com/redhat-developer/kubernetes-image-puller#configuration
 CMD ["/kubernetes-image-puller"]
 
 # append Brew metadata here
