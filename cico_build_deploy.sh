@@ -75,11 +75,11 @@ install_deps
 make build
 TAG=$(echo $GIT_COMMIT | cut -c1-${DEVSHIFT_TAG_LEN})
 if [[ ${TARGET:-"centos"} = 'rhel' ]]; then
-  docker build -t ${LOCAL_IMAGE_NAME} -f ./docker/rhel.Dockerfile . | cat
+  docker build -t ${LOCAL_IMAGE_NAME} -f ./docker/Dockerfile.rhel . | cat
   tag_and_push ${REGISTRY}/${ORGANIZATION}/${RHEL_IMAGE_NAME}:${TAG}
   tag_and_push ${REGISTRY}/${ORGANIZATION}/${RHEL_IMAGE_NAME}:latest
 else
-  docker build -t ${LOCAL_IMAGE_NAME} -f ./docker/centos.Dockerfile . | cat
+  docker build -t ${LOCAL_IMAGE_NAME} -f ./docker/Dockerfile.centos . | cat
   tag_and_push ${REGISTRY}/${ORGANIZATION}/${CENTOS_IMAGE_NAME}:${TAG}
   tag_and_push ${REGISTRY}/${ORGANIZATION}/${CENTOS_IMAGE_NAME}:latest
 fi
