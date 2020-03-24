@@ -10,8 +10,6 @@ projects:
 attributes:
   persistVolumes: 'false'
 components:
-  - id: redhat/vscode-openshift-connector/latest
-    type: chePlugin
   - id: ms-vscode/go/latest
     memoryLimit: 512Mi
     preferences:
@@ -25,8 +23,8 @@ components:
         port: 8080
     memoryLimit: 2Gi
     type: dockerimage
-    alias: go-cli
     image: 'quay.io/eclipse/che-golang-1.12:nightly'
+    alias: go-cli
     env:
       - value: '/go:$(CHE_PROJECTS_ROOT)'
         name: GOPATH
@@ -40,12 +38,5 @@ commands:
           ${CHE_PROJECTS_ROOT}/src/github.com/redhat-developer/kubernetes-image-puller
         type: exec
         command: go build -v -o ./bin/kubernetes-image-puller ./cmd/main.go
-        component: go-cli
-  - name: test kubernetes-image-puller
-    actions:
-      - workdir: >-
-          ${CHE_PROJECTS_ROOT}/src/github.com/redhat-developer/kubernetes-image-puller
-        type: exec
-        command: go test -v ./...
         component: go-cli
 
