@@ -7,7 +7,10 @@ data:
   IMAGES: >
     java11-maven=quay.io/eclipse/che-java11-maven:nightly;
     sidecar-java=quay.io/eclipse/che-sidecar-java:11;
-    che-theia=eclipse/che-theia:7.8.0;
+    che-theia=quay.io/eclipse/che-theia:7.15.1;
+    theia-endpoint=quay.io/eclipse/che-theia-endpoint-runtime-binary:7.15.1;
+    metadata-broker=quay.io/eclipse/che-plugin-metadata-broker:v3.2.0;
+    artifact-broker=quay.io/eclipse/che-plugin-artifacts-broker:v3.2.0;
   DAEMONSET_NAME: "kubernetes-image-puller"
   CACHING_INTERVAL_HOURS: "1"
   OPENSHIFT_PROXY_URL: "https://osoproxy.prod-preview.openshift.io"
